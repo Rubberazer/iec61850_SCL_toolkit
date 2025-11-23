@@ -11,7 +11,7 @@ The usual:
 	python icd_DO_extractor.py SCL_file_name
 	
 	
-It is going to produce to files:
+It is going to produce two files:
 
 	-variables_extract.csv -> all the DOs in the IEDs
 	
