@@ -181,7 +181,7 @@ for IED in IEDs:
                             variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
                                                  + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), verify_if_none(desc)])
                             print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                  + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + verify_if_none(desc))0
+                                  + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + verify_if_none(desc))
                     else:
                         variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
                                              + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name'), DO.get('type'), verify_if_none(desc)])
