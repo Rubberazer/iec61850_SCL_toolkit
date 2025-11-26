@@ -19,7 +19,7 @@ The usual:
 It is going to produce two files:
 
 	
-- variables_extract.csv -> all the DOs in the IEDs
+- variables_extract_DO.csv -> all the DOs in the IEDs
 	
 - variables_report.csv  -> only the DOs linked to the reports set up in the IEDs
 	
