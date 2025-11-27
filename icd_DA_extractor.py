@@ -34,15 +34,7 @@ templates = root.findall('.//{*}LNodeType')
 templates_DO = root.findall('.//{*}DOType')
 templates_DA = root.findall('.//{*}DAType')
 
-# Change type SDOs
-for DO_type in templates_DO:
-    SDOs = DO_type.findall('./{*}SDO')
-    for SDO in SDOs: 
-        for type in templates_DO:
-            if SDO.attrib['type'] == type.attrib['id']: 
-                SDO.set('type', type.get('cdc'))
-
-# Insert SDOs & DAs in DOs
+# Insert SDOs in DOs
 for template in templates:
     DOs = template.findall('.//{*}DO')
     for DO in DOs:
@@ -52,7 +44,18 @@ for template in templates:
                 if SDOs:
                     for SDO in SDOs:
                         DO.append(SDO)
-                #DO.set('type', DO_type.get('cdc'))
+
+# Insert DAs in SDOs
+
+for template in templates:
+    SDOs = template.findall('.//{*}SDO')
+    for SDO in SDOs:
+        for DO_type in templates_DO:
+            if SDO.attrib['type'] == DO_type.attrib['id']:
+                DAs = DO_type.findall('./{*}DA')
+                if DAs:
+                    for DA in DAs:
+                        SDO.append(DA)
 
 # Insert DAs in DOs
 
@@ -67,6 +70,7 @@ for template in templates:
                         DO.append(DA)
 
 # Insert BDAs in DAs
+
 for template in templates:
     DAs = template.findall('.//{*}DA')
     for DA in DAs:
@@ -98,17 +102,26 @@ for IED in IEDs:
                     LN_DOs = template.findall('./{*}DO')
                     for DO in LN_DOs:
                         SDOs = DO.findall('./{*}SDO')
-                        DAs = DO.findall('./{*}DA')
                         for DOI in LN_DOIs:
                             if DO.get('name') == DOI.get('name'):
                                 desc = DOI.get('desc')
                         if SDOs:
-                            for SDO in SDOs:    
-                                variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), '', verify_if_none(desc)])
-                                print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                      + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + '' + ',' + verify_if_none(desc))
-                        elif DAs:
+                            for SDO in SDOs:
+                                DAs = SDO.findall('./{*}DA')
+                                if DAs:
+                                    for DA in DAs:
+                                        variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name'), DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                        print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                              + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc))
+                                else:
+                                    if DAs:
+                                        variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), '', verify_if_none(desc)])
+                                        print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + '' + ',' + verify_if_none(desc))
+                        else:
+                            DAs = DO.findall('./{*}DA')
                             for DA in DAs:
                                 BDAs = DA.findall('./{*}BDA')
                                 if BDAs:
@@ -130,17 +143,26 @@ for IED in IEDs:
                     LN_DOs = template.findall('./{*}DO')
                     for DO in LN_DOs:
                         SDOs = DO.findall('./{*}SDO')
-                        DAs = DO.findall('./{*}DA')
                         for DOI in LN_DOIs:
                             if DO.get('name') == DOI.get('name'):
                                 desc = DOI.get('desc')
                         if SDOs:
-                            for SDO in SDOs:    
-                                variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), '', verify_if_none(desc)])
-                                print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                      + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + '' + ',' + verify_if_none(desc))
-                        elif DAs:
+                            for SDO in SDOs:
+                                DAs = SDO.findall('./{*}DA')
+                                if DAs:
+                                    for DA in DAs:
+                                        variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name'), DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                        print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                              + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc))
+                                else:
+                                    if DAs:
+                                        variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), '', verify_if_none(desc)])
+                                        print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + '' + ',' + verify_if_none(desc))
+                        else:
+                            DAs = DO.findall('./{*}DA')
                             for DA in DAs:
                                 BDAs = DA.findall('./{*}BDA')
                                 if BDAs:
