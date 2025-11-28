@@ -43,7 +43,8 @@ for template in templates:
                 SDOs = DO_type.findall('./{*}SDO')
                 if SDOs:
                     for SDO in SDOs:
-                        DO.append(SDO)
+                        if SDO not in DO:
+                            DO.append(SDO)
 
 # Insert DAs in SDOs
 for template in templates:
@@ -54,7 +55,8 @@ for template in templates:
                 DAs = DO_type.findall('./{*}DA')
                 if DAs:
                     for DA in DAs:
-                        SDO.append(DA)
+                        if DA not in SDO:
+                            SDO.append(DA)
 
 # Insert DAs in DOs
 for template in templates:
@@ -65,18 +67,33 @@ for template in templates:
                 DAs = DO_type.findall('./{*}DA')
                 if DAs:
                     for DA in DAs:
-                        DO.append(DA)
+                        if DA not in DO:
+                            DO.append(DA)
 
 # Insert BDAs in DAs
 for template in templates:
     DAs = template.findall('.//{*}DA')
     for DA in DAs:
         for DA_type in templates_DA:
-            if DA.get('type') == DA_type.get('id'): #DA.attrib['type'] == DA_type.attrib['id']:
+            if DA.get('type') == DA_type.get('id'):
                 BDAs = DA_type.findall('./{*}BDA')
                 if BDAs:
                     for BDA in BDAs:
-                        DA.append(BDA)
+                        if BDA not in DA:
+                            DA.append(BDA)
+
+# Insert BDAs in BDAs
+for template in templates:
+    BDAs = template.findall('.//{*}BDA')
+    if BDAs:
+        for BDA in BDAs:
+            for template_type in templates_DA:
+                if (BDA.get('type') == template_type.get('id')) and (BDA.get('bType') == 'Struct'):
+                    BDAs_type = template_type.findall('./{*}BDA')
+                    if BDAs_type:
+                        for BDA_type in BDAs_type:
+                            if BDA_type not in BDA:
+                                BDA.append(BDA_type)
 
 print('-------Writing variable list--------')
 #Opening file
@@ -109,35 +126,51 @@ for IED in IEDs:
                                         BDAs = DA.findall('./{*}BDA')
                                         if BDAs:
                                             for BDA in BDAs:
-                                                variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name'), BDA.get('bType'), DA.get('fc'), verify_if_none(desc)])
-                                                print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + ',' + BDA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                                BDAs_type = BDA.findall('./{*}BDA')
+                                                if BDAs_type:
+                                                    for BDA_type in BDAs_type:
+                                                        variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                        + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + '.' + BDA_type.get('name'), BDA_type.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                                        print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                        + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + '.' + BDA_type.get('name') + ',' + BDA_type.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                                else:
+                                                    variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name'), BDA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                                    print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + ',' + BDA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
                                         else:
                                             variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name')  + SDO.get('name') + '.' + DA.get('name') , DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name')  + SDO.get('name') + '.' + DA.get('name') , DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
                                             print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name')  + SDO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name')  + SDO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
                                 else:
                                     variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), '', verify_if_none(desc)])
+                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), '', verify_if_none(desc)])
                                     print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + '' + ',' + verify_if_none(desc))
+                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + '' + ',' + verify_if_none(desc))
                         else:
                             DAs = DO.findall('./{*}DA')
                             for DA in DAs:
                                 BDAs = DA.findall('./{*}BDA')
                                 if BDAs:
                                     for BDA in BDAs:
-                                        variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name'), BDA.get('bType'), DA.get('fc'), verify_if_none(desc)])
-                                        print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + ',' + BDA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                        BDAs_type = BDA.findall('./{*}BDA')
+                                        if BDAs_type:
+                                            for BDA_type in BDAs_type:
+                                                variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + '.' + BDA_type.get('name'), BDA_type.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                                print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + '.' + BDA_type.get('name') + ',' + BDA_type.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                        else:
+                                            variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name'), BDA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                            print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + ',' + BDA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
                                 else:
                                     variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                        + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') , DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') , DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
                                     print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                        + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
                        
         for LN in LNOs:
             LN_DOIs = LN.findall('./{*}DOI')
@@ -157,42 +190,58 @@ for IED in IEDs:
                                         BDAs = DA.findall('./{*}BDA')
                                         if BDAs:
                                             for BDA in BDAs:
-                                                variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name'), BDA.get('bType'), DA.get('fc'), verify_if_none(desc)])
-                                                print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + ',' + BDA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                                BDAs_type = BDA.findall('./{*}BDA')
+                                                if BDAs_type:
+                                                    for BDA_type in BDAs_type:
+                                                        variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                        + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + '.' + BDA_type.get('name'), BDA_type.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                                        print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                        + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + '.' + BDA_type.get('name') + ',' + BDA_type.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                                else:
+                                                    variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name'), BDA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                                    print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + ',' + BDA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
                                         else:
                                             variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name')  + SDO.get('name') + '.' + DA.get('name') , DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name')  + SDO.get('name') + '.' + DA.get('name') , DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
                                             print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name')  + SDO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name')  + SDO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
                                 else:
                                     variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), '', verify_if_none(desc)])
+                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name'), SDO.get('type'), '', verify_if_none(desc)])
                                     print(IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + '' + ',' + verify_if_none(desc))
+                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + ',' + SDO.get('type') + ',' + '' + ',' + verify_if_none(desc))
                         else:
                             DAs = DO.findall('./{*}DA')
                             for DA in DAs:
                                 BDAs = DA.findall('./{*}BDA')
                                 if BDAs:
                                     for BDA in BDAs:
-                                        variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name'), BDA.get('bType'), DA.get('fc'), verify_if_none(desc)])
-                                        print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + ',' + BDA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                        BDAs_type = BDA.findall('./{*}BDA')
+                                        if BDAs_type:
+                                            for BDA_type in BDAs_type:
+                                                variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + '.' + BDA_type.get('name'), BDA_type.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                                print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                                + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + '.' + BDA_type.get('name') + ',' + BDA_type.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+                                        else:
+                                            variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name'), BDA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                            print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
+                                            + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.'  + SDO.get('name') + '.' + DA.get('name') + '.' + BDA.get('name') + ',' + BDA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
                                 else:
                                     variables_DO.append([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                        + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') , DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
+                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') , DA.get('bType'), DA.get('fc'), verify_if_none(desc)])
                                     print([IED.get('name') + LD.get('inst') + '/' + verify_if_none(LN.get('prefix'))
-                                        + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
-
+                                    + LN.get('lnClass') + LN.get('inst') + '.' + DO.get('name') + '.' + DA.get('name') + ',' + DA.get('bType') + ',' + DA.get('fc') + ',' + verify_if_none(desc)])
+'''            
 variables_DA = []
 for line in variables_DO:
     if line not in variables_DA:
         variables_DA.append(line)
-        
-for column in variables_DA:
+'''        
+for column in variables_DO:
     f.write(column[0] + ',' + column[1] + ',' + column[2] + ',' + column[3] +'\n')
 
 f.close()
