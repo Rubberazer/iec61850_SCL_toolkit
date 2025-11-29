@@ -159,8 +159,8 @@ for IED in IEDs:
             if report.get('datSet') == dataset.get('name'):        
                 FCDAs = dataset.findall('./{*}FCDA')
                 for  fcda in FCDAs:
-                    Variables_report.append([IED.get('name') + fcda.get('ldInst') + '/' + fcda.get('prefix')
-                                             + fcda.get('lnClass') + fcda.get('lnInst') + '.' + fcda.get('doName'),'',''])
+                    Variables_report.append([IED.get('name') + verify_if_none(fcda.get('ldInst')) + '/' + verify_if_none(fcda.get('prefix'))
+                                             + verify_if_none(fcda.get('lnClass')) + verify_if_none(fcda.get('lnInst')) + '.' + verify_if_none(fcda.get('doName')),'',''])
                     print(verify_if_none(IED.get('name')) + verify_if_none(fcda.get('ldInst')) + '/' + verify_if_none(fcda.get('prefix'))
                           + verify_if_none(fcda.get('lnClass')) + verify_if_none(fcda.get('lnInst')) + '.' + verify_if_none(fcda.get('doName')) + ',' + ',')
 
