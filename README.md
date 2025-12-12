@@ -1,6 +1,7 @@
 # iec61850_SCL_toolkit
 
-A few humble Python scripts that I use at work to extract variables from SCL files.
+A few humble Python script that I use sometimes to extract variables from SCL files.
+
 Put together in a rush and clunky as hell, but they seem to do the job. 
 
 
